@@ -1,0 +1,8 @@
+checkpoint_at_max_steps:
+  _target_: lightning.pytorch.callbacks.ModelCheckpoint
+  save_top_k: -1
+  save_last: False
+  dirpath: ${checkpointing.save_dir}/checkpoints
+  verbose: True
+  auto_insert_metric_name: False
+  every_n_train_steps: ${trainer.max_steps}

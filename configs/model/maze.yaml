@@ -1,0 +1,21 @@
+name: maze
+type: dit
+# Maze backbone: hidden size 256, 8 blocks, 8 heads (8.01M parameters at
+# cond_dim=128). Use with data=maze. The sequence is maze + solution (see
+# dataloader.MazeTokenizer), so length = 2*data.grid_size^2.
+hidden_size: 256
+cond_dim: 128
+length: 450  # Must equal 2*data.grid_size^2; the maze scripts pass model.length=800.
+n_blocks: 8
+n_heads: 8
+dropout: 0.1
+
+block: prenorm    # prenorm | sandwich (x=n2(x+Attn(n1(x))); x=n4(x+MLP(n3(x)))) | sandwich_swin (x=x+n2(Attn(n1(x))); x=x+n4(MLP(n3(x))))
+norm: layer       # layer | rms
+norm_eps: null    # null => class default (1e-5 layer, 1e-6 rms)
+
+embed_norm: False      # normalize embedding rows, scale by a learnable scalar
+embed_norm_init: null  # null => mean row norm at init
+
+spectral_norm: false       # spectral-normalize attn/MLP block weights (Lipschitz bound) for loop stability
+spectral_norm_iters: 1     # power iterations per forward for the spectral-norm estimate

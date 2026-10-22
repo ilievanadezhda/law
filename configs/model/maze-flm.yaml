@@ -1,0 +1,20 @@
+name: maze-flm
+type: flm-dit
+# FLM backbone (models/flm_dit.FLMDIT) at the maze preset's architecture:
+# same hidden_size / n_blocks / n_heads / dropout as configs/model/maze.yaml,
+# so this is parameter-matched to the AR / MDLM / DUO / LDDM / LAW maze runs.
+# Use with data=maze algo=flm.
+#
+# length must equal 2*data.grid_size^2: 800 for data=maze (grid_size=20).
+# The maze scripts pass model.length=800.
+#
+# NOTE: flm-dit reads only the keys below -- maze.yaml's block / norm /
+# norm_eps / embed_norm* are DIT-only and would be ignored, so they are
+# deliberately not restated here.
+hidden_size: 256
+cond_dim: 128
+length: 450
+n_blocks: 8
+n_heads: 8
+dropout: 0.1
+softcap: 0.0

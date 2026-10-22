@@ -1,0 +1,24 @@
+# S-FLM SphereArch backbone (models/sphere_arch.SphereArch) at the maze
+# preset's width/depth, so it is size-matched to maze-sphere-dit and the two
+# are directly comparable. Mirrors small-/tiny-sphere-arch.yaml, which are the
+# presets the s-flm repo ships.
+#
+# normalize_input_embed=False is the "no_renorm" of the released recipe
+# sfm_sphere_arch_truncated_adaptive_no_renorm.sh. Note that recipe pairs it
+# with algo.renormalize_weights=TRUE, which SphereArch requires -- the
+# sphere-dit recipes are the ones that set renormalize_weights=False.
+name: maze-sfm-arch
+type: sphere-arch
+hidden_size: 256
+cond_dim: 128
+length: 450  # Must equal 2*data.grid_size^2; the maze scripts pass model.length=800.
+n_blocks: 8
+n_heads: 8
+dropout: 0.1
+init: ngpt
+eps: 1e-6
+use_time_alpha: True   # additive modulation of eigen learning rates
+use_time_token: False  # appended time token (stripped before head)
+mlp_type: gelu
+normalize_input_embed: False
+pretrained_ckpt_path: null

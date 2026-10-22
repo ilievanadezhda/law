@@ -1,0 +1,30 @@
+name: small
+type: sphere-arch
+hidden_size: 768
+cond_dim: 128
+length: 1024
+n_blocks: 12
+n_heads: 12
+dropout: 0.1
+# Sphere embedding initialization strategy:
+#   random    – N(0, 0.02²) raw weights; original baseline
+#   ngpt      – N(0, 1/d)   raw weights; nGPT convention
+#   pretrained – zeros initially; call init_sphere_embed_from_pretrained()
+init: ngpt
+eps: 1e-6
+# σ-conditioning flags (independent, both ablatable):
+use_time_alpha: True   # additive modulation of eigen learning rates
+use_time_token: False  # appended time token (stripped before head)
+# MLP variant:
+#   gelu   – matches SphereDiT (Linear → GELU → Linear) with s_fc scaling
+#   swiglu – paper default (gated SiLU) with suv scaling
+mlp_type: gelu
+# Whether to renormalize sphere_embed.weight along embedding dim after each
+# optimizer step. User found off → better on sudoku; paper defaults to on.
+normalize_input_embed: False
+# Optional: path to an AR or DUO Lightning checkpoint. When set, SphereArch
+# adapts the source weights on the fly at construction (strips "backbone.",
+# renames vocab_embed.embedding -> sphere_embed.weight, copies shape-matching
+# params). Loading happens BEFORE renormalize_weights() so the loaded weights
+# are snapped onto the sphere like freshly-initialized ones.
+pretrained_ckpt_path: null

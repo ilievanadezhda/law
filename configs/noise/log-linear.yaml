@@ -1,0 +1,5 @@
+type: log-linear
+eps: 1e-3
+alpha_min: null
+alpha_max: null
+adaptive: false

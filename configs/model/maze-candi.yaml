@@ -1,0 +1,24 @@
+name: maze-candi
+type: candi-dit
+# CANDI backbone (models/candi_dit.ContDIT) at the maze preset's
+# architecture: same hidden_size / n_blocks / n_heads / dropout as
+# configs/model/maze.yaml, so this is parameter-matched to the AR / MDLM /
+# DUO / LDDM / LAW maze runs. Use with data=maze algo=candi.
+#
+# length must equal 2*data.grid_size^2: 800 for data=maze (grid_size=20).
+# The maze scripts pass model.length=800.
+#
+# use_original_rope=True selects CANDIDDiTBlock (upstream CANDI's rotary
+# variant), matching configs/model/small-candi.yaml. softcap is read only
+# when use_original_rope=False, but is kept for parity with that preset.
+#
+# NOTE: CANDI widens the vocab by one (mask token appended), so its
+# embedding/output layers are marginally larger than the other baselines'.
+hidden_size: 256
+cond_dim: 128
+length: 450
+n_blocks: 8
+n_heads: 8
+dropout: 0.1
+softcap: 0.0
+use_original_rope: True

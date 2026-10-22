@@ -1,0 +1,20 @@
+train: maze
+valid: maze
+tokenizer_name_or_path: maze
+cache_dir: data
+wrap: False
+streaming: False
+insert_train_eos: False
+insert_valid_eos: False
+
+# HRM Maze-Hard recipe (Lehnert et al. 2024 generator + difficulty filter),
+# regenerated at 20x20 by build_maze_hard_dataset.py; see its docstring.
+# HRM's released set is 30x30 with rating >= 110; min_rating=71 keeps the
+# same tail fraction of the generator at 20x20 (use 110 with grid_size=30 to
+# reproduce HRM's distribution). Sequence length = 2 * 20^2 = 800.
+generator: hrm_hard
+grid_size: 20
+min_rating: 71              # rating = shortest-path cells incl. S and G
+num_train: 1000             # HRM Maze-Hard: 1000 train / 1000 test
+num_valid: 1000
+data_seed: 42

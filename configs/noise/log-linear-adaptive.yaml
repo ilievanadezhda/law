@@ -1,0 +1,16 @@
+type: log-linear
+eps: 1e-3
+alpha_min: null
+alpha_max: null
+adaptive: true
+adaptive_buffer_size: ${eval:${loader.global_batch_size} * ${noise.adaptive_refit_every} // 10}
+adaptive_refit_every: 500
+adaptive_n_grid: 1000
+adaptive_n_knots: 20
+adaptive_spline_degree: 3
+adaptive_ridge_alpha: 1e-3
+adaptive_uniform_mix: 1e-3
+adaptive_warmup_steps: 1000
+adaptive_ema: 0.0
+adaptive_plot_profile: false
+adaptive_plot_dir: adaptive_noise_plots

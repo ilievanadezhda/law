@@ -1,0 +1,14 @@
+name: sfm
+diffusion_type: sphere
+backbone: sphere-dit
+parameterization: mean
+time_conditioning: True
+loss_type: ce
+T: 0
+causal_attention: False
+adaLN: True
+slerp_precision: float64
+eps: 1e-6
+
+invert_time_convention: true  # true: alpha_t=1 is noisy (original SFM). false: alpha_t=1 is clean (MDLM-like, required for adaptive noise schedule).
+renormalize_weights: False

@@ -1,0 +1,36 @@
+name: duo-mixing
+backbone: dit
+parameterization: mean
+time_conditioning: True
+# T: number of DISCRETE noise levels seen during TRAINING. _sample_t quantizes
+#   t to {1/T, 2/T, ..., 1}; T=0 means continuous-time training (no quantization).
+#   This is now DECOUPLED from the unroll step size -- see dt_T below.
+T: 0
+causal_attention: False
+loss_type: elbo
+adaLN: True
+diffusion_type: uniform
+
+# ── MixingDUO parameters ──────────────────────────────────────────
+# dt_T: denominator of the unroll step size: dt = 1/dt_T (for step_strategy=uniform;
+#   n/dt_T for the random strategies). Defaults to algo.T for backward-compat, so
+#   existing T=128 runs are unchanged. Override to DECOUPLE step size from the
+#   noise-level count, e.g. algo.T=0 (continuous time) + algo.dt_T=128 (dt=1/128).
+#   MUST be > 0 for MixingDUO (it divides by dt_T).
+dt_T: ${algo.T}
+mixing_depth: 4               # max number of unrolled steps
+k: 1                          # k <= mixing_depth, else use 'last' for mixing_option
+MC: 'probs'                   # probs / qxs  (what to mix through the embeddings)
+loss: 'nll'                   # CE / nll
+mixing_option: 'every-k'      # every-k / last
+detach_mixing: False
+
+# step size of each unroll transition: dt depends on step_strategy
+step_strategy: 'uniform'      # uniform / uniform_random_size / random_size_decrease / nonuniform_random
+step_upperbound: 16           # upper bound for the *_random_size step strategies
+
+# number of unrolled steps per sample
+mixing_depth_policy: 'fixed'        # fixed / random / curriculum
+mixing_depth_probabilities: null    # required when mixing_depth_policy=random
+curriculum_steps: null              # required when mixing_depth_policy=curriculum
+reset_during_curriculum: False

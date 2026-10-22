@@ -1,0 +1,21 @@
+name: small
+type: sphere-dit
+hidden_size: 768
+cond_dim: 128
+length: 1024
+n_blocks: 12
+n_heads: 12
+dropout: 0.1
+# Sphere embedding initialization strategy:
+#   random    – N(0, 0.02²) raw weights; original baseline
+#   ngpt      – N(0, 1/d)   raw weights; nGPT convention, better gradient conditioning
+#   pretrained – L2-normalized pretrained LM embeddings (call
+#                backbone.init_sphere_embed_from_pretrained() after construction)
+init: ngpt
+learn_temperature_scaling: False
+eps: 1e-6
+# Optional: path to an AR or DUO Lightning checkpoint. When set, SphereDiT
+# adapts the source weights on the fly at construction time (strips the
+# "backbone." prefix, renames vocab_embed.embedding -> sphere_embed.weight,
+# copies shape-matching params; the rest keep their fresh-init values).
+pretrained_ckpt_path: null

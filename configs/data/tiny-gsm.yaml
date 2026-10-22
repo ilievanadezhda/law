@@ -1,0 +1,14 @@
+train: tiny_gsm
+valid: tiny_gsm
+tokenizer_name_or_path: gpt2
+cache_dir: ./data_cache
+wrap: True  # Probably should only use for pre-training
+streaming: False
+insert_train_eos: True
+insert_valid_eos: True
+separator: '\n'
+train_on_prompt: True  # Probably shouldn't for SFT, for pretrain only
+train_on_pad: False
+val_ratio: 0.01  # represents >100k examples
+val_seed: 42
+filter_too_long: False

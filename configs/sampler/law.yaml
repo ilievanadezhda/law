@@ -1,0 +1,9 @@
+predictor: law
+steps: 256
+steps_policy: full
+noise_removal: ancestral
+temperature_schedule: constant-1.0
+use_float64: False
+p_nucleus: 1.0
+num_sample_batches: 2
+num_sample_log: 2

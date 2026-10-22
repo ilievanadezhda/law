@@ -1,0 +1,24 @@
+name: law
+backbone: dit
+parameterization: mean
+time_conditioning: True
+T: 0
+causal_attention: False
+adaLN: True
+diffusion_type: uniform
+
+loss: elbo
+pass_objective: mean
+pass_count_probabilities: [0, 1]
+stop_gradient_between_passes: True
+advance_time_between_passes: True
+dt: 0.001953125  # 1/512
+
+carry_regularization:
+  temperature:
+    enabled: False
+    range_scale: 2.0
+    # False reuses each sample's draw; True redraws per sample per pass.
+    resample_per_pass: False
+  gaussian_std: 0.0
+  rotation_fraction: 0.0

@@ -1,0 +1,30 @@
+name: maze-sfm
+type: sphere-dit
+# S-FLM backbone (models/sphere_dit.SphereDiT) at the maze preset's
+# architecture: same hidden_size / n_blocks / n_heads / dropout as
+# configs/model/maze.yaml, so this is parameter-matched to the AR / MDLM /
+# DUO / LDDM / LAW / CANDI / FLM maze runs. Use with data=maze algo=sfm.
+#
+# length must equal 2*data.grid_size^2: 800 for data=maze (grid_size=20).
+# The maze scripts pass model.length=800.
+#
+# NOTE: sphere-dit reads only the keys below -- maze.yaml's block / norm /
+# norm_eps / embed_norm* are DIT-only and would be ignored, so they are
+# deliberately not restated here (same convention as maze-flm.yaml).
+hidden_size: 256
+cond_dim: 128
+length: 450
+n_blocks: 8
+n_heads: 8
+dropout: 0.1
+
+# Sphere embedding initialization:
+#   random     - N(0, 0.02^2) raw weights; original baseline
+#   ngpt       - N(0, 1/d) raw weights; nGPT convention, better gradient
+#                conditioning. This is what the released S-FLM recipes use.
+#   pretrained - L2-normalized pretrained LM embeddings (needs
+#                pretrained_ckpt_path)
+init: ngpt
+learn_temperature_scaling: False
+eps: 1e-6
+pretrained_ckpt_path: null

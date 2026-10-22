@@ -1,0 +1,11 @@
+predictor: sfm
+steps: 1024
+noise_removal: ancestral  # 'ancestral' (sample) or 'greedy' (argmax) at the final step
+use_float64: true
+velocity: exact  # exact / sample
+p_nucleus: 1.0
+top_k: -1
+top_k_velocity: -1  # top-k for velocity computation (-1 = use all vocab)
+temperature_schedule: constant-1.0
+num_sample_batches: 2
+num_sample_log: 2

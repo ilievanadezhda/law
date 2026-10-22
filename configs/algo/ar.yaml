@@ -1,0 +1,10 @@
+name: ar
+diffusion_type: null
+backbone: dit
+parameterization: ar
+time_conditioning: False
+causal_attention: True
+# Irrelevant flags
+T: 0
+subs_masking: False
+adaLN: False

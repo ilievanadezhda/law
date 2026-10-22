@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Finetunes Duo (250k steps on TinyGSM) with LAW for 50k steps. DONOR_CKPT is
+# tinygsm/finetune/duo_original/duo-250000.ckpt from the Hugging Face repo.
+
+set -euo pipefail
+export TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
+
+REPO_ROOT="$(cd "$(dirname "$0")/../../../../.." && pwd)"
+CACHE_DIR="${CACHE_DIR:-${REPO_ROOT}/data_cache}"
+DONOR_CKPT="${DONOR_CKPT:-${REPO_ROOT}/checkpoints/tinygsm/finetune/duo_original/duo-250000.ckpt}"
+OUTPUT_DIR="${OUTPUT_DIR:-${REPO_ROOT}/outputs/tinygsm/finetune/law/finetune-tinygsm-law-ee-replace-p10-p90-elbo-last-only-temperature-rng-3-bs-128}"
+NUM_NODES="${NUM_NODES:-1}"
+DEVICES="${DEVICES:-4}"
+
+cd "${REPO_ROOT}"
+
+python -u -m main \
+    data=tiny-gsm \
+    data.tokenizer_name_or_path=HuggingFaceTB/SmolLM-135M \
+    data.cache_dir="${CACHE_DIR}" \
+    data.wrap=False \
+    data.train_on_prompt=False \
+    data.train_on_pad=True \
+    data.filter_too_long=True \
+    model=small-loop \
+    model.length=512 \
+    model.mode_embedding=False \
+    algo=law \
+    algo.loss=elbo \
+    'algo.pass_count_probabilities=[0.1,0.9]' \
+    algo.pass_objective=last_only \
+    algo.stop_gradient_between_passes=True \
+    algo.carry_regularization.temperature.enabled=True \
+    algo.carry_regularization.temperature.range_scale=3 \
+    algo.carry_regularization.temperature.resample_per_pass=False \
+    sampler=law \
+    loader.global_batch_size=128 \
+    loader.batch_size=32 \
+    loader.eval_batch_size=16 \
+    loader.num_workers=8 \
+    eval.generate_samples=False \
+    trainer.num_nodes="${NUM_NODES}" \
+    trainer.devices="${DEVICES}" \
+    trainer.max_steps=50000 \
+    trainer.val_check_interval=1000000 \
+    trainer.limit_val_batches=0 \
+    trainer.num_sanity_val_steps=0 \
+    'callbacks=[checkpoint_every_n_steps,checkpoint_monitor,learning_rate_monitor,checkpoint_at_max_steps]' \
+    callbacks.checkpoint_every_n_steps.every_n_train_steps=5000 \
+    training.finetune_path="${DONOR_CKPT}" \
+    training.finetune_from_ema=False \
+    checkpointing.resume_from_ckpt=True \
+    checkpointing.resume_ckpt_path="${OUTPUT_DIR}/checkpoints/last.ckpt" \
+    hydra.run.dir="${OUTPUT_DIR}"

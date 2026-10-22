@@ -1,0 +1,12 @@
+# Ancestral sampler (posterior sampling for MDLM / DUO)
+predictor: ancestral
+steps: 1024
+steps_policy: full      # full: use steps as-is / proportional: steps * num_tokens_to_generate
+noise_removal: ancestral  # ancestral / greedy  (greedy=argmax, ancestral=sample)
+decoder_mode: raw         # raw: final tokens read straight from the NN x0 output
+                          # posterior: read from q(x0 | z_t, x0_pred) instead
+use_float64: true
+p_nucleus: 1.0
+temperature_schedule: constant-1.0
+num_sample_batches: 2
+num_sample_log: 2

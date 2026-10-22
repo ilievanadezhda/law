@@ -1,0 +1,12 @@
+# Autoregressive sampler
+predictor: ar
+steps: 1
+noise_removal: none
+use_float64: true
+p_nucleus: 1.0
+greedy: False
+temperature: 1.0
+num_sample_batches: 2
+num_sample_log: 2
+use_kv_cache: True
+early_stopping: false

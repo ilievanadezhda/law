@@ -1,0 +1,19 @@
+name: flm
+diffusion_type: flow
+parameterization: mean
+time_conditioning: True
+loss_type: flow
+T: 0
+causal_attention: False
+adaLN: True
+subs_masking: False
+ignore_bos: False
+t_max: 1.0
+t_min: 0.0
+double_temb: False
+learnable_loss_weighting: False
+# Output-logit softcap: model_output <- cap_value * tanh(model_output / cap_value)
+# Upstream FLM uses 30.0. null disables the cap (backward-compat default
+# for checkpoints trained without it). Set to 30.0 for new training that
+# matches the upstream reference exactly.
+cap_value: null

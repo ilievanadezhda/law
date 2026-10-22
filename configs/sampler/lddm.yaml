@@ -1,0 +1,9 @@
+predictor: lddm
+steps: 1024
+steps_policy: full
+noise_removal: ancestral
+use_float64: True
+p_nucleus: 1.0
+temperature_schedule: constant-1.0
+num_sample_batches: 2
+num_sample_log: 2

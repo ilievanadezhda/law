@@ -1,0 +1,130 @@
+defaults:
+  - _self_
+  - /callbacks: [checkpoint_every_n_steps, checkpoint_monitor, learning_rate_monitor]
+  - /data: openwebtext
+  - /model: small
+  - /strategy: ddp
+  - /noise: log-linear
+  - /lr_scheduler: constant_warmup
+  - /prior: none
+  - /algo: mdlm
+  - /sampler: ancestral
+
+mode: train  # train / ppl_eval / sample_eval / gsm8k_eval / sudoku_eval / maze_eval
+
+sudoku:
+  output_dir: ${cwd:}/sudoku_eval
+  batch_size: 64
+
+maze:
+  output_dir: ${cwd:}/maze_eval
+  batch_size: 16
+  eval_split: valid  # valid / train -- 'train' scores the model on the data it
+                     # was trained on, which is what an overfitting sanity
+                     # check needs (held-out accuracy is meaningless there).
+  max_examples: null # null => score the whole split; an int caps it, since
+                     # sampling is num_examples x sampler.steps forward passes.
+
+gsm8k:
+  input_file: null  # if set, skip sampling and evaluate directly from this JSON file
+  output_dir: ${cwd:}/gsm8k_eval
+  timeout: 5.0
+  bootstrap_size: 1  # 1 = single estimate (std=0); >1 = N bootstrap resamples, report mean ± std
+
+seed: 1
+allow_tf32: True
+cudnn_benchmark: True
+compile_backbone: False  # False / True
+
+neg_infinity_mode: large-finite  # large-finite / true-inf / value-{float} <- value after '-' is cast to a float, negated and used
+
+loader:
+  global_batch_size: 512
+  eval_global_batch_size: ${.global_batch_size}
+  # Note: batch_size and eval_batch_size are **per machine**
+  batch_size: ${div_up:${.global_batch_size}, ${eval:${trainer.devices} * ${trainer.num_nodes}}}
+  eval_batch_size: ${div_up:${.eval_global_batch_size}, ${eval:${trainer.devices} * ${trainer.num_nodes}}}
+  num_workers: 12
+  pin_memory: True
+
+confidence_denoiser:
+  confidence_score: 'entropy'  # entropy / margin / confidence
+  gamma: 0
+
+training:
+  ema: 0.9999
+  antithetic_sampling: True
+  importance_sampling: False
+  sampling_eps: 1e-3
+  change_of_variables: False
+  loss_precision: 'bf16'  # bf16, float32, float64
+  finetune_path: ''
+  finetune_from_ema: False   # warm-start from the ckpt's EMA weights, not the online weights
+  # Used by D3LM only:
+  sampling_eps_min: 1e-3
+  sampling_eps_max: 1.0
+  resample: False
+
+eval:
+  checkpoint_path: ''  # Used to evaluate a checkpoint after training.
+  strict_loading: true  # Set to false for backwards compat with old checkpoints.
+  disable_ema: False
+  compute_generative_perplexity: False
+  perplexity_batch_size: 8
+  compute_perplexity_on_sanity: False
+  gen_ppl_eval_model_name_or_path: gpt2-large  # gpt2-large, meta-llama/Llama-2-7b-hf
+  generate_samples: True
+  generate_samples_every_n_steps: 0  # 0 = every validation
+  generated_samples_path: ${cwd:}/samples.json
+  results_json_path: null
+  compute_hidden_corr: False  # utils.token_correlation on the pre-logits hidden
+
+optim:
+  weight_decay: 0
+  lr: 3e-4
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1e-8
+
+trainer:
+  _target_: lightning.Trainer
+  accelerator: cuda
+  num_nodes: 1
+  devices: ${device_count:}
+  accumulate_grad_batches: ${div_up:${loader.global_batch_size}, ${eval:${trainer.devices} * ${loader.batch_size} * ${trainer.num_nodes}}}
+  gradient_clip_val: 1.0
+  precision: 'bf16'
+  num_sanity_val_steps: 2
+  max_steps: 1_000_000
+  log_every_n_steps: 100
+  limit_train_batches: 1.0   # train on full dataset, can be used to toggle quick run
+  limit_val_batches: 1.0     # validate on full dataset, can be used to toggle quick run
+  val_check_interval: 5000
+  check_val_every_n_epoch: null
+
+wandb:
+  project: debug
+  # null = wandb's own default entity. Set this explicitly (per-run or per
+  # script) for anything that must not land in a shared team space.
+  entity: null
+  notes: null
+  group: null
+  job_type: null
+  tags:
+    - ${noise.type}
+    - ${data.train}
+    - ${data.valid}
+    - ${algo.name}
+
+hydra:
+  run:
+    dir: ./outputs/${data.train}/${now:%Y.%m.%d}/${now:%H%M%S}
+  job:
+    chdir: true
+
+checkpointing:
+  # Use custom `save_dir` if, e.g., saving to S3 bucket, otherwise leave this parameter as is
+  save_dir: ${cwd:}
+  # Note: `checkpoints` path should correspond to `checkpoint_every_n_steps.dirpath`
+  resume_from_ckpt: true
+  resume_ckpt_path: ${.save_dir}/checkpoints/last.ckpt

@@ -1,0 +1,17 @@
+name: small
+type: dit
+hidden_size: 768
+cond_dim: 128
+length: 1024
+n_blocks: 12
+n_heads: 12
+dropout: 0.1
+block: prenorm    # prenorm | sandwich (x=n2(x+Attn(n1(x))); x=n4(x+MLP(n3(x)))) | sandwich_swin (x=x+n2(Attn(n1(x))); x=x+n4(MLP(n3(x))))
+norm: layer       # layer | rms
+norm_eps: null    # null => class default (1e-5 layer, 1e-6 rms)
+
+embed_norm: False      # normalize embedding rows, scale by a learnable scalar
+embed_norm_init: null  # null => mean row norm at init
+
+spectral_norm: false       # spectral-normalize attn/MLP block weights (Lipschitz bound) for loop stability
+spectral_norm_iters: 1     # power iterations per forward for the spectral-norm estimate

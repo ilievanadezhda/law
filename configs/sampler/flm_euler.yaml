@@ -1,0 +1,8 @@
+predictor: flm_euler
+steps: 128
+noise_removal: none
+use_float64: true
+p_nucleus: 1.0
+temperature_schedule: constant-1.0
+num_sample_batches: 1
+num_sample_log: 2

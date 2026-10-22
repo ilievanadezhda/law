@@ -1,0 +1,11 @@
+name: mdlm
+diffusion_type: absorbing
+backbone: dit
+parameterization: subs
+time_conditioning: False
+T: 0  # 0 (continuous time) / 1000 
+causal_attention: False
+loss_type: elbo  # elbo, low_var
+
+post_process_mode: log_probs  # log_probs / logits (sampling-only for logits)
+adaLN: True

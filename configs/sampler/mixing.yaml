@@ -1,0 +1,11 @@
+# MixingDUO sampler
+predictor: mixing
+steps: 1024
+steps_policy: full         # full: use steps as-is / proportional: steps * (gen_len / num_tokens)
+noise_removal: ancestral   # ancestral / greedy
+use_float64: False
+MC: probs                  # probs / qxs
+p_nucleus: 1.0
+temperature: 1.0
+num_sample_batches: 2
+num_sample_log: 2
